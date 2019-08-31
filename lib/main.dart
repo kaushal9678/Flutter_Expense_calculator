@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import './widgets/new_transaction.dart';
 import './widgets/transactions_list.dart';
 import './model/transaction.dart';
+import './widgets/chart.dart';
 
 void main() => runApp(MyApp());
 
@@ -11,39 +12,41 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      //title: 'Flutter Demo',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
-        primarySwatch: Colors.purple,
-        accentColor: Colors.amber,
-      ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+          primarySwatch: Colors.purple,
+          accentColor: Colors.amber,
+          fontFamily: 'Quicksand',
+          textTheme: ThemeData.light().textTheme.copyWith(
+                title: TextStyle(
+                  fontFamily: 'OpenSans',
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
+              ),
+          appBarTheme: AppBarTheme(
+            textTheme: ThemeData.light().textTheme.copyWith(
+                  title: TextStyle(
+                    fontFamily: 'OpenSans',
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+          )),
+      home: MyHomePage(),
     );
+    // home: MyHomePage(title: 'Flutter Demo Home Page'),
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  final title;
-  // String titleInput;
-  //String amountInput;
-
-  MyHomePage({this.title});
-
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
   final List<Transaction> _userTransactions = [
-    Transaction(
+    /*  Transaction(
       id: "t1",
       title: "New Shoes",
       amount: 69.99,
@@ -54,8 +57,19 @@ class _MyHomePageState extends State<MyHomePage> {
       title: "Weekly Groceery",
       amount: 12.99,
       date: DateTime.now(),
-    )
+    ) */
   ];
+
+  List<Transaction> get _recentTransactions {
+    return _userTransactions.where((tx) {
+      return tx.date.isAfter(
+        DateTime.now().subtract(
+          Duration(days: 7),
+        ),
+      );
+    }).toList();
+  }
+
   void _addNewTransactions(String txTitle, double txAmount) {
     final newTx = Transaction(
         amount: txAmount,
@@ -94,7 +108,7 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
-        title: Text("App"),
+        title: Text("Expense Recorder"),
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.add),
@@ -107,21 +121,7 @@ class _MyHomePageState extends State<MyHomePage> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
-            Container(
-              child: Card(
-                child: Padding(
-                  padding: EdgeInsets.only(left: 5, top: 15, bottom: 5),
-                  child: Text(
-                    "Charts",
-                    style: TextStyle(
-                        color: Colors.blue, fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ),
-              width: double.infinity,
-              height: 50,
-            ),
-            //UserTransaction()
+            Chart(_recentTransactions),
             TransactionList(
               transactions: _userTransactions,
             ),
